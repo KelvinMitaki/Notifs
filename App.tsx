@@ -18,6 +18,12 @@ export default function App() {
       await Notification.requestPermissionsAsync();
     };
     perm();
+    const sub = Notification.addNotificationReceivedListener(notif =>
+      console.log(notif)
+    );
+    return () => {
+      sub.remove();
+    };
   }, []);
   return (
     <View style={styles.container}>
