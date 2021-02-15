@@ -1,17 +1,31 @@
 import { StatusBar } from "expo-status-bar";
-import React from "react";
+import React, { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Button } from "react-native-elements";
-import * as Notifications from "expo-notifications";
+import * as Notification from "expo-notifications";
+
+Notification.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true
+  })
+});
 
 export default function App() {
+  useEffect(() => {
+    const perm = async () => {
+      await Notification.requestPermissionsAsync();
+    };
+    perm();
+  }, []);
   return (
     <View style={styles.container}>
       <Text>Open up App.tsx to start working on your app!</Text>
       <Button
         title="Trigger Notification"
         onPress={() => {
-          Notifications.scheduleNotificationAsync({
+          Notification.scheduleNotificationAsync({
             content: {
               title: "My first notification",
               body: "This is the first local notification we are sending"
