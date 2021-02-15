@@ -18,11 +18,15 @@ export default function App() {
       await Notification.requestPermissionsAsync();
     };
     perm();
-    const sub = Notification.addNotificationReceivedListener(notif =>
+    const backgroundSub = Notification.addNotificationResponseReceivedListener(
+      notif => console.log(notif)
+    );
+    const foregroundSub = Notification.addNotificationReceivedListener(notif =>
       console.log(notif)
     );
     return () => {
-      sub.remove();
+      foregroundSub.remove();
+      backgroundSub.remove();
     };
   }, []);
   return (
