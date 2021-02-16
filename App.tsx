@@ -1,8 +1,9 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Alert, StyleSheet, Text, View } from "react-native";
 import { Button } from "react-native-elements";
 import * as Notification from "expo-notifications";
+import axios from "axios";
 
 Notification.setNotificationHandler({
   handleNotification: async () => ({
@@ -13,9 +14,20 @@ Notification.setNotificationHandler({
 });
 
 export default function App() {
+  const [token, setToken] = useState<string>("");
   useEffect(() => {
     const perm = async () => {
-      await Notification.requestPermissionsAsync();
+      const res = await Notification.requestPermissionsAsync();
+
+      if (res.granted) {
+        const token = await Notification.getExpoPushTokenAsync();
+        setToken(token.data);
+      } else {
+        Alert.alert(
+          "Permission denied",
+          "you need to allow permission for this to work"
+        );
+      }
     };
     perm();
     const backgroundSub = Notification.addNotificationResponseReceivedListener(
@@ -45,6 +57,20 @@ export default function App() {
             }
           });
         }}
+      />
+      <Button
+        title="From Expo Server"
+        onPress={async () => {
+          await axios.post(`https://exp.host/--/api/v2/push/send`, {
+            to: token,
+            data: {
+              extraData: "Some Data"
+            },
+            title: "Sent via the app",
+            body: "this is a push notification sent via the app"
+          });
+        }}
+        buttonStyle={{ marginTop: 20 }}
       />
       <StatusBar style="auto" />
     </View>
